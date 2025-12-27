@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 5099630899547786731}
   - component: {fileID: 1531688026209123650}
   - component: {fileID: 7961455192526689505}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: FlowerTile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
