@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 5099630899547786731}
   - component: {fileID: 1531688026209123650}
   - component: {fileID: 7961455192526689505}
+  - component: {fileID: 2002988214414978016}
   m_Layer: 3
   m_Name: HiveTile
   m_TagString: Untagged
@@ -677,3 +678,17 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 0}
+--- !u!114 &2002988214414978016
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7739788373561969788}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6230a49105a6f2e46b564bbaa897250f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TileClickHandler
+  tileType: 0
+  hexGrid: {fileID: 0}

@@ -116,10 +116,18 @@ public class HexGrid : MonoBehaviour
     /// </summary>
     void SpawnTile(Vector2Int coord, GameObject prefab, string tileName)
     {
-        Vector3 position = AxialToWorld(coord);  // Convert grid coords to 3D world position
+        Vector3 position = AxialToWorld(coord);
         GameObject tile = Instantiate(prefab, position, Quaternion.identity, transform);
-        tile.name = tileName;                    // Give it a readable name in hierarchy
-        spawnedTiles[coord] = tile;              // Store reference in dictionary
+        tile.name = tileName;
+        spawnedTiles[coord] = tile;
+
+        // Set up TileClickHandler if it exists
+        TileClickHandler clickHandler = tile.GetComponent<TileClickHandler>();
+        if (clickHandler != null)
+        {
+            clickHandler.SetTileCoordinate(coord);
+            clickHandler.SetHexGrid(this);
+        }
     }
 
     /// <summary>
@@ -269,5 +277,47 @@ public class HexGrid : MonoBehaviour
             rr = -rq - rs;
 
         return new Vector2Int(rq, rr);  // Return as axial coordinates (only need q and r)
+    }
+
+    /// <summary>
+    /// Checks if a tile at the given coordinate is connected to the Hive using BFS.
+    /// Public method that can be called by other scripts (TileClickHandler, TileHoverDetector).
+    /// </summary>
+    public bool IsTileConnectedToHive(Vector2Int coord)
+    {
+        // The Hive itself is always "connected"
+        if (coord == Vector2Int.zero) return true;
+
+        // If there's no tile at this coordinate, it's not connected
+        if (!TileExistsAt(coord)) return false;
+
+        // Use BFS (Breadth-First Search) to find path to Hive
+        Queue<Vector2Int> queue = new Queue<Vector2Int>();
+        HashSet<Vector2Int> visited = new HashSet<Vector2Int>();
+
+        queue.Enqueue(coord);
+        visited.Add(coord);
+
+        while (queue.Count > 0)
+        {
+            Vector2Int current = queue.Dequeue();
+
+            // Check all neighbors of current tile
+            foreach (Vector2Int neighbor in GetNeighbors(current))
+            {
+                // Found the Hive! This tile is connected
+                if (neighbor == Vector2Int.zero) return true;
+
+                // If neighbor has a tile and we haven't visited it yet
+                if (TileExistsAt(neighbor) && !visited.Contains(neighbor))
+                {
+                    queue.Enqueue(neighbor);
+                    visited.Add(neighbor);
+                }
+            }
+        }
+
+        // Exhausted all paths, no connection to Hive found
+        return false;
     }
 }

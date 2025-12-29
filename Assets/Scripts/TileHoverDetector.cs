@@ -259,6 +259,23 @@ public class TileHoverDetector : MonoBehaviour
     {
         Debug.Log($"Selected position {coord} for building!");
 
+        // NEW: Check if player can afford the Connector
+        if (!ResourceManager.Instance.CanAffordConnector())
+        {
+            Debug.Log("Not enough Wax! Need 10 Wax to build.");
+            // Optional: Flash red text or play error sound
+            UnlockHighlights(); // Clear highlights
+            return;
+        }
+
+        // NEW: Deduct the Wax cost
+        if (!ResourceManager.Instance.SpendWax(10))
+        {
+            Debug.LogWarning("Failed to spend Wax!");
+            UnlockHighlights();
+            return;
+        }
+
         // Spawn the connector tile at this position
         hexGrid.SpawnConnectorTile(coord);
 
@@ -377,32 +394,8 @@ public class TileHoverDetector : MonoBehaviour
     /// </summary>
     bool IsTileConnectedToHive(Vector2Int coord)
     {
-        if (coord == Vector2Int.zero) return true;
-        if (!hexGrid.TileExistsAt(coord)) return false;
-
-        Queue<Vector2Int> queue = new Queue<Vector2Int>();
-        HashSet<Vector2Int> visited = new HashSet<Vector2Int>();
-
-        queue.Enqueue(coord);
-        visited.Add(coord);
-
-        while (queue.Count > 0)
-        {
-            Vector2Int current = queue.Dequeue();
-
-            foreach (Vector2Int neighbor in hexGrid.GetNeighbors(current))
-            {
-                if (neighbor == Vector2Int.zero) return true;
-
-                if (hexGrid.TileExistsAt(neighbor) && !visited.Contains(neighbor))
-                {
-                    queue.Enqueue(neighbor);
-                    visited.Add(neighbor);
-                }
-            }
-        }
-
-        return false;
+        // Use HexGrid's centralized connection checking
+        return hexGrid.IsTileConnectedToHive(coord);
     }
 
     void OnDisable()
