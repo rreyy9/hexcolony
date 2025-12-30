@@ -141,14 +141,6 @@ The game uses 3D assets arranged in a 2D board layout:
 
 ---
 
-## Win Condition
-
-Player successfully connects pathways from Hive to all 3 Flower tiles.
-
-**Display message:** "Colony Expanded Successfully!"
-
----
-
 ## UI Elements
 
 ### Resource Display
