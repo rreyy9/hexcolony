@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections.Generic;
 
 public class ResourceManager : MonoBehaviour
@@ -156,6 +156,40 @@ public class ResourceManager : MonoBehaviour
 
         return true;
     }
+
+    /// <summary>
+    /// Spawns a new worker bee at a specific location chosen by the player.
+    /// Returns true if successful, false if can't afford.
+    /// </summary>
+    public bool SpawnWorkerAtLocation(Vector2Int coord, WorkerBee.AssignmentType assignmentType)
+    {
+        if (!CanAffordWorker())
+        {
+            Debug.Log($"Cannot spawn worker: Need {workerCost} Nectar.");
+            return false;
+        }
+
+        // Deduct the cost
+        currentNectar -= workerCost;
+        Debug.Log($"Spent {workerCost} Nectar. Remaining: {currentNectar}");
+
+        // Create the worker at player-chosen location
+        WorkerBee newWorker = new WorkerBee(coord, assignmentType);
+        activeWorkers.Add(newWorker);
+
+        Debug.Log($"Worker #{activeWorkers.Count} spawned! Assigned to {assignmentType} at {coord}");
+
+        return true;
+    }
+
+
+    /// <summary>
+    /// <summary>
+    /// Spawns a new worker bee at a specific location chosen by the player.
+    /// Returns true if successful, false if can't afford.
+    /// </summary>
+
+
 
     /// <summary>
     /// Auto-assignment logic: Assigns new worker based on current resource needs.

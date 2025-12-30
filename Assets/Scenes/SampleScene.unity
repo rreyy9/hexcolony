@@ -865,6 +865,56 @@ MonoBehaviour:
   highlightYOffset: 0.1
   outlineMaterial: {fileID: 2100000, guid: 328c355cc48ca884185be6b6b8d4ae95, type: 2}
   normalHighlightMaterial: {fileID: 2100000, guid: 5e9414197ea67c941966db6d9b72312b, type: 2}
+--- !u!1 &454297485
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 454297488}
+  - component: {fileID: 454297487}
+  m_Layer: 0
+  m_Name: WorkerPlacementController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &454297487
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 454297485}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c4059ec635153e409f725f2136b9061, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WorkerPlacementController
+  highlightPrefab: {fileID: 7739788373561969788, guid: 50e52768726e399468b77a66ce386998, type: 3}
+  highlightNormalMaterial: {fileID: 2100000, guid: 5e9414197ea67c941966db6d9b72312b, type: 2}
+  highlightHoverMaterial: {fileID: 2100000, guid: 328c355cc48ca884185be6b6b8d4ae95, type: 2}
+  tileLayerMask:
+    serializedVersion: 2
+    m_Bits: 8
+--- !u!4 &454297488
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 454297485}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.14649, y: 0, z: 0.76736}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &643739735
 GameObject:
   m_ObjectHideFlags: 0
@@ -1965,7 +2015,6 @@ MonoBehaviour:
   currentWax: 0
   currentNectar: 0
   workerCost: 30
-  maxWorkers: 5
 --- !u!4 &1883342024
 Transform:
   m_ObjectHideFlags: 0
@@ -2132,3 +2181,4 @@ SceneRoots:
   - {fileID: 1883342024}
   - {fileID: 1751379985}
   - {fileID: 1174570867}
+  - {fileID: 454297488}

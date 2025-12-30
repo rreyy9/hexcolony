@@ -103,24 +103,23 @@ public class UIManager : MonoBehaviour
                 workerCostText.color = Color.red;
             }
         }
-
-        // REMOVED: No more max workers check
     }
 
     /// <summary>
     /// Called when the spawn worker button is clicked.
     /// </summary>
-    void OnSpawnWorkerClicked()
+void OnSpawnWorkerClicked()
     {
-        if (resourceManager.SpawnWorker())
+        // Find WorkerPlacementController
+        WorkerPlacementController placementController = FindFirstObjectByType<WorkerPlacementController>();
+        
+        if (placementController != null)
         {
-            Debug.Log("Worker spawned successfully!");
-            // Optional: Play spawn sound effect here
+            placementController.ActivatePlacementMode();
         }
         else
         {
-            Debug.Log("Failed to spawn worker - not enough resources or at max workers.");
-            // Optional: Play error sound here
+            Debug.LogError("WorkerPlacementController not found!");
         }
     }
 
