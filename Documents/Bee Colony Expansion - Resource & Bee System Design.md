@@ -1,14 +1,16 @@
 # Bee Colony Expansion - Resource & Bee System Design
 
-**Document Version:** 1.0  
-**Last Updated:** December 29, 2025  
-**Status:** Design Complete - Ready for Implementation
+**Document Version:** 2.0  
+**Last Updated:** December 30, 2025  
+**Status:** Design Updated - Player Agency Focus
 
 ---
 
 ## Overview
 
 This document outlines the complete Resource and Worker Bee system for Bee Colony Expansion MVP. The game transitions from a pure clicker to an idle/clicker hybrid as players progress.
+
+**Key Design Change:** Players have full control over where they spawn worker bees, choosing between Hive (Wax generation) or Flowers (Nectar generation) based on their strategic needs.
 
 ---
 
@@ -28,7 +30,8 @@ Goal: Manually gather resources, connect first Flower
 ```
 Once player has enough Nectar:
 ├── Spawn first AI Worker Bee (costs 30 Nectar)
-├── Worker auto-collects resources passively
+├── Player CHOOSES where to spawn: Hive or connected Flower
+├── Worker auto-collects resources passively at chosen location
 └── Player still clicks for extra resources (clicker bonus)
 
 Goal: Transition from active clicking to passive generation
@@ -37,12 +40,12 @@ Goal: Transition from active clicking to passive generation
 ### Phase 3: Automation (Late Game - Minutes 3-5)
 ```
 Multiple Workers:
-├── Auto-assigned to Hive or Flowers based on need
+├── Player strategically places workers based on resource needs
 ├── Player focuses on expansion strategy
 ├── Clicks provide bonus acceleration
 └── Complete win condition (all 3 Flowers connected)
 
-Goal: Optimize resource flow, achieve victory
+Goal: Optimize resource flow through strategic placement, achieve victory
 ```
 
 ---
@@ -83,33 +86,30 @@ Game Start:
 
 ### Worker Bee Properties
 - **Cost to spawn:** 30 Nectar (flat rate for all Workers)
-- **Maximum Workers:** 5 (for MVP scope)
-- **Assignment System:** Auto-Assignment (Option B - Selected)
+- **Maximum Workers:** Unlimited (player can spawn as many as they can afford)
+- **Assignment System:** Player Choice (Manual Assignment)
 - **Generation Rates:**
   - Hive Workers: 1 Wax per second
   - Flower Workers: 0.5 Nectar per second
 
-### Auto-Assignment Logic (Option B)
+### Player-Controlled Assignment System
 
-Workers are automatically assigned based on current resource needs:
-
+Workers are manually assigned by the player at spawn time:
 ```
-Worker Assignment Priority:
-1. If Wax < 50 → Assign to Hive
-2. Else if Nectar < 30 → Assign to available connected Flower
-3. Else → Distribute evenly between Hive and Flowers
-
-Reassignment Triggers:
-- When a new Flower connects to the Hive
-- When a new Worker is spawned
-- When resource thresholds change
+Worker Spawn Flow:
+1. Player clicks "Spawn Worker" button (requires 30 Nectar)
+2. Game enters "Worker Placement Mode"
+3. Valid spawn locations highlight (Hive + all connected Flowers)
+4. Player hovers over desired location (highlight glows)
+5. Player clicks to confirm spawn location
+6. Worker appears and begins generating resources
 ```
 
-**Why Auto-Assignment:**
-- Simpler for MVP (no UI for manual assignment)
-- More idle-game feel (player focuses on expansion)
-- Automatically optimizes resource flow
-- Reduces decision paralysis for new players
+**Why Player Choice:**
+- Gives strategic depth (choose Wax vs Nectar based on current needs)
+- Player agency improves engagement and decision-making
+- More satisfying gameplay loop (player controls their economy)
+- Adapts to different playstyles (aggressive expansion vs. resource hoarding)
 
 ---
 
@@ -131,7 +131,6 @@ Reassignment Triggers:
 ### Click Bonus System
 
 Player clicks remain valuable even with AI Workers:
-
 ```
 Click Value Scaling:
 - Base: 1 resource per click
@@ -199,16 +198,36 @@ On Player Click (Hive or Flower):
 │ Wax: 25             │
 │ Nectar: 15          │
 │                     │
-│ Workers: 2 / 5      │
+│ Workers: 2          │
 │ [Spawn Worker]      │  ← Button (costs 30 Nectar)
 │ Cost: 30 Nectar     │
 └─────────────────────┘
 ```
 
 **Button States:**
-- **Enabled (green):** Player has ≥30 Nectar, not at max Workers
+- **Enabled (green):** Player has ≥30 Nectar
 - **Disabled (gray):** Player has <30 Nectar
-- **Hidden:** Already at max Workers (5/5)
+
+**When Clicked:**
+- Enters Worker Placement Mode
+- Shows spawn location highlights
+
+### Worker Placement Mode UI
+
+**Visual Indicators:**
+```
+During Placement Mode:
+├── Highlights on Hive (always available)
+├── Highlights on all connected Flowers
+├── Hover effect (bright glow) on targeted location
+├── Optional: Cursor change to indicate placement mode
+└── Optional: "Choose spawn location" text prompt
+```
+
+**Cancel Options:**
+- Right-click anywhere
+- Press Escape key
+- Click outside valid spawn locations
 
 ### Tile Hover Tooltips
 
@@ -256,25 +275,26 @@ On Player Click (Hive or Flower):
 ### Minute 1-2: Hybrid Phase
 1. Player alternates clicking Hive and Flower
 2. Accumulates 30 Nectar (requires ~30 clicks on Flower)
-3. Clicks "Spawn Worker" button
-4. First AI Worker spawns, auto-assigns to Hive
-5. Wax now generates passively (1 per second)
-6. Player focuses more on clicking Flower for Nectar
+3. Clicks "Spawn Worker" button → Enters placement mode
+4. Player chooses Hive (needs more Wax for expansion)
+5. First Worker spawns at Hive
+6. Wax now generates passively (1 per second)
+7. Player focuses more on clicking Flower for Nectar
 
-### Minute 2-3: Idle Acceleration
+### Minute 2-3: Strategic Phase
 1. Player uses passive Wax to build toward second Flower
 2. Accumulates 30 Nectar again
-3. Spawns second AI Worker (auto-assigns to first Flower)
+3. Clicks "Spawn Worker" → Chooses first connected Flower
 4. Nectar now generates passively (0.5 per second)
-5. Second Flower connects, auto-assignment optimizes
-6. Resource generation accelerates
+5. Second Flower connects
+6. Player decides: More Wax workers or Nectar workers?
 
-### Minute 3-5: Strategic Phase
-1. Player has 3-4 Workers active
-2. Clicks provide 2x bonus multiplier
-3. Passive generation handles most needs
-4. Player focuses on connecting third Flower
-5. Spawns 5th Worker if desired
+### Minute 3-5: Optimization Phase
+1. Player has multiple workers (3-5)
+2. Balances worker placement based on bottlenecks
+3. Clicks provide significant bonus (2-3x multiplier)
+4. Passive generation handles most resource needs
+5. Player focuses on connecting third Flower
 6. All 3 Flowers connected → Win condition achieved
 
 **Total MVP Playtime:** ~5 minutes ✅
@@ -291,8 +311,7 @@ ResourceManager (Singleton MonoBehaviour)
 │   ├── currentNectar (float for accumulation, int for display)
 │   ├── waxAccumulator (tracks fractional seconds)
 │   ├── nectarAccumulator (tracks fractional seconds)
-│   ├── activeWorkers (List<WorkerBee>)
-│   └── maxWorkers (const int = 5)
+│   └── activeWorkers (List<WorkerBee>)
 │
 ├── Methods:
 │   ├── AddWax(int amount) - from player clicks
@@ -300,52 +319,52 @@ ResourceManager (Singleton MonoBehaviour)
 │   ├── CanAffordConnector() → bool (checks Wax >= 10)
 │   ├── SpendWax(int amount) → bool
 │   ├── CanAffordWorker() → bool (checks Nectar >= 30)
-│   ├── SpawnWorker() → bool (creates new WorkerBee)
+│   ├── SpawnWorker(Vector2Int coord, AssignmentType type) → bool
 │   └── Update() - handles passive generation accumulation
 ```
 
 ### Worker Bee Class
 ```
-WorkerBee (MonoBehaviour or data class)
+WorkerBee (Data class, not MonoBehaviour)
 ├── Fields:
-│   ├── assignedTile (Vector2Int coordinate)
+│   ├── assignedTileCoordinate (Vector2Int)
 │   ├── assignmentType (enum: Hive, Flower)
 │   ├── generationRate (float: 1.0 for Hive, 0.5 for Flower)
-│   └── visualRepresentation (GameObject sprite/model)
+│   └── visualObject (GameObject sprite/model)
+│
+├── Constructor:
+│   └── WorkerBee(Vector2Int coord, AssignmentType type)
+│
+└── Methods:
+    └── GetGenerationRate() → float
+```
+
+### Worker Placement Controller
+```
+WorkerPlacementController (MonoBehaviour)
+├── Purpose: Handles placement mode UI and interaction
 │
 ├── Methods:
-│   ├── AssignToTile(Vector2Int coord, TileType type)
-│   ├── GetGenerationRate() → float
-│   └── UpdatePosition() - moves visual to assigned tile
-```
-
-### Auto-Assignment Logic
-```
-Method: ReassignWorkers()
-Called when:
-- New Worker spawned
-- New Flower connected
-- Resource thresholds crossed
-
-Logic:
-1. Get list of all Workers
-2. Get current Wax and Nectar values
-3. Get list of connected Flowers
-4. If Wax < 50: Prioritize Hive assignments
-5. Else if Nectar < 30: Prioritize Flower assignments
-6. Else: Distribute evenly
-7. Update each Worker's assignment
-8. Move Worker visuals to new positions
+│   ├── ActivatePlacementMode() - Called by Spawn Worker button
+│   ├── ShowSpawnLocations() - Highlights Hive + connected Flowers
+│   ├── DetectHover() - Checks which location player is hovering
+│   ├── OnLocationClicked() - Spawns worker at chosen location
+│   └── CancelPlacement() - Exits placement mode
+│
+└── Visual Management:
+    ├── Creates highlight GameObjects on valid spawn tiles
+    ├── Changes material on hover (normal → bright)
+    └── Destroys highlights when placement completes/cancels
 ```
 
 ### Flower Connection Detection
 ```
-Method: CheckFlowerConnection(Vector2Int flowerCoord)
+Method: IsTileConnectedToHive(Vector2Int coord)
 Returns: bool (is connected to Hive)
 
 Logic:
-1. Use existing BFS pathfinding from TileHoverDetector
-2. Start at flowerCoord
+1. Use existing BFS pathfinding from HexGrid
+2. Start at coord
 3. Search for path to Hive (0,0)
 4. Return true if path exists
 5. Cache result until next tile placement
@@ -357,7 +376,7 @@ On Player Click:
 1. Raycast from mouse to detect tile
 2. Get tile coordinate
 3. Check if tile is Hive or Flower
-4. If Flower, verify connection with CheckFlowerConnection()
+4. If Flower, verify connection with IsTileConnectedToHive()
 5. If valid, call ResourceManager.AddWax() or AddNectar()
 6. Trigger visual feedback (animation, floating text, particles)
 ```
@@ -375,7 +394,7 @@ On Player Click:
 | Nectar per Click | 1 | Equal to Wax |
 | Connector Cost | 10 Wax | ~10 clicks, feels achievable |
 | Worker Cost | 30 Nectar | ~1 minute with 1 Flower |
-| Max Workers | 5 | Keeps MVP focused |
+| Max Workers | Unlimited | Player-driven economy scaling |
 | Hive Generation | 1 Wax/sec | Matches click value |
 | Flower Generation | 0.5 Nectar/sec | Slower, more valuable |
 | Click Bonus Threshold | 3 Workers | Rewards progression |
@@ -396,12 +415,17 @@ If playtesting shows 10-click start is too slow:
 - **Efficient Foraging:** Workers generate +25% resources (50 Nectar)
 - **Click Training:** Player clicks worth +1 bonus (100 Nectar)
 - **Rapid Building:** Connector tiles cost 8 Wax instead of 10 (75 Nectar)
-- **Hive Expansion:** Increase max Workers to 10 (200 Nectar)
+- **Bulk Spawning:** Spawn 3 workers at once for 80 Nectar (20 Nectar discount)
 
 ### Worker Specialization
 - **Forager Bee:** Generates 1.0 Nectar/sec (upgrade cost: 50 Nectar)
 - **Builder Bee:** Generates 1.5 Wax/sec (upgrade cost: 50 Wax)
 - **Scout Bee:** Reveals optimal path to Flowers (upgrade cost: 100 Nectar)
+
+### Worker Management Features
+- **Reassign Worker:** Click existing worker to move to different location
+- **Dismiss Worker:** Remove worker to get 15 Nectar refund
+- **Auto-Assign Toggle:** Optional AI assignment for players who want it
 
 ### Visual Enhancements
 - 3D bee models with flight animation
@@ -420,9 +444,9 @@ If playtesting shows 10-click start is too slow:
 ## Open Questions & Decisions
 
 ### Resolved Decisions:
-✅ **Worker Assignment:** Auto-Assignment (Option B) - Selected  
+✅ **Worker Assignment:** Player Choice (Manual Assignment) - Selected  
 ✅ **Worker Cost:** Flat 30 Nectar each  
-✅ **Max Workers:** 5 for MVP  
+✅ **Max Workers:** Unlimited (player-driven scaling)  
 ✅ **Click Bonus:** Scales with worker count (+1 per 2 Workers)  
 
 ### Remaining Questions:
@@ -438,9 +462,9 @@ If playtesting shows 10-click start is too slow:
    - **Recommendation:** Option A for MVP, upgrade to B post-launch
 
 3. **Tutorial/Onboarding:**
-   - Should there be tooltips guiding first clicks?
-   - "Click the Hive to gather Wax!" on first load?
-   - **Recommendation:** Single tooltip on game start, disappears after first click
+   - Should there be tooltips guiding first worker spawn?
+   - "Click to choose where your worker will gather resources!" prompt?
+   - **Recommendation:** Single tooltip on first spawn, disappears after placement
 
 4. **Resource Cap:**
    - Should Wax/Nectar have maximum values (999? unlimited?)
@@ -449,6 +473,11 @@ If playtesting shows 10-click start is too slow:
 5. **Worker Visual Position:**
    - Exactly centered on tile, or slight random offset for multiple Workers?
    - **Recommendation:** Centered for single Worker, slight offset if multiple on same tile
+
+6. **Placement Mode Clarity:**
+   - Should valid spawn locations pulse/animate to draw attention?
+   - Should there be a "Cancel" button on-screen during placement?
+   - **Recommendation:** Pulsing highlights + on-screen prompt with Cancel instructions
 
 ---
 
@@ -473,12 +502,15 @@ If playtesting shows 10-click start is too slow:
 3. Call `ResourceManager.SpendWax(10)` on successful placement
 4. Show visual feedback if insufficient Wax (red text flash?)
 
-### Phase 4: Worker Bee System
-1. Create `WorkerBee` class (simple data class initially)
+### Phase 4: Worker Placement System
+1. Create `WorkerPlacementController.cs` script
 2. Add "Spawn Worker" UI button
-3. Check `ResourceManager.CanAffordWorker()` on button click
-4. Deduct 30 Nectar, create new Worker instance
-5. Implement auto-assignment logic (Option B)
+3. Implement `ActivatePlacementMode()` method
+4. Show highlights on Hive + connected Flowers
+5. Detect hover and apply glow effect to hovered location
+6. Handle click to spawn worker at chosen location
+7. Validate spawn location (must be Hive or connected Flower)
+8. Deduct 30 Nectar and create Worker instance
 
 ### Phase 5: Passive Generation
 1. Add `Update()` loop in `ResourceManager`
@@ -489,17 +521,17 @@ If playtesting shows 10-click start is too slow:
 
 ### Phase 6: Worker Visualization
 1. Create simple sprite/circle prefab for Worker
-2. Spawn visual above assigned tile
+2. Spawn visual above assigned tile when worker created
 3. Add gentle bobbing animation (up/down)
 4. Color-code: Yellow for Hive, Pink for Flowers
-5. Destroy visual when Worker is reassigned
+5. Update worker count display on each tile
 
 ### Phase 7: Polish & Balancing
 1. Playtest full 5-minute loop
 2. Adjust values if pacing feels off
 3. Add particle effects to clicks (optional)
 4. Improve UI feedback for button states
-5. Add tooltips for Hive and Flowers
+5. Add tooltips for Hive and Flowers showing worker counts
 
 ---
 
@@ -512,18 +544,18 @@ The Resource & Bee System is complete when:
 ✅ Player can click connected Flowers to generate Nectar  
 ✅ Disconnected Flowers are not clickable (visual feedback clear)  
 ✅ Player can spend 30 Nectar to spawn AI Worker Bees  
-✅ Workers auto-assign to Hive or Flowers based on need  
+✅ Player can choose where to spawn workers (Hive or any connected Flower)  
+✅ Placement mode shows clear visual feedback (highlights, hover effects)  
 ✅ Workers passively generate resources at correct rates  
 ✅ UI displays current Wax, Nectar, and Worker count  
 ✅ Click bonus system works (clicks worth more with more Workers)  
-✅ Game is completable in ~5 minutes with satisfying progression  
+✅ Game is completable in ~5 minutes with satisfying strategic decisions  
 
 ---
 
 ## Appendix: Example Playtesting Session
 
 **Player: New user testing MVP for first time**
-
 ```
 00:00 - Game starts, sees Hive and 3 Flowers
 00:10 - Discovers clicking Hive generates Wax (+1 per click)
@@ -533,16 +565,21 @@ The Resource & Bee System is complete when:
 01:30 - Continues pattern, connects first Flower
 01:45 - Discovers clicking Flower generates Nectar
 02:00 - Alternates between clicking Hive and Flower
-02:30 - Accumulates 30 Nectar, sees "Spawn Worker" button lights up
-02:45 - Spawns first Worker, notices Wax now generates automatically
+02:30 - Accumulates 30 Nectar, "Spawn Worker" button lights up
+02:40 - Clicks button, enters placement mode
+02:42 - Sees highlights on Hive and connected Flower
+02:45 - Thinks: "I need more Wax to expand", clicks Hive highlight
+02:46 - Worker spawns at Hive, Wax generates automatically
 03:00 - Focuses on clicking Flower, builds toward second Flower
-03:30 - Spawns second Worker, Nectar also generates passively
-04:00 - Has 3 Workers, clicks now worth 2x bonus
-04:30 - Connects second and third Flowers rapidly
+03:30 - Spawns second Worker at Flower for Nectar generation
+04:00 - Has 3 Workers (2 Hive, 1 Flower), clicks now worth 2x
+04:15 - Realizes can spawn more workers, adds another to Flower
+04:30 - Connects second and third Flowers rapidly with passive Wax
+04:45 - Spawns final workers strategically for balanced economy
 05:00 - Win condition achieved: "Colony Expanded Successfully!"
 ```
 
-**Feedback:** "Satisfying progression from clicking to automation. Loved watching my workers help out!"
+**Feedback:** "Loved having control over my workers! Felt like I was really managing the colony. The choice between Wax and Nectar workers added great strategy."
 
 ---
 
