@@ -320,4 +320,30 @@ public class HexGrid : MonoBehaviour
         // Exhausted all paths, no connection to Hive found
         return false;
     }
+
+    /// <summary>
+    /// Returns a list of all Flower tile coordinates that are currently connected to the Hive.
+    /// </summary>
+    public List<Vector2Int> GetConnectedFlowers()
+    {
+        List<Vector2Int> connectedFlowers = new List<Vector2Int>();
+
+        foreach (Vector2Int flowerPos in flowerPositions)
+        {
+            if (IsTileConnectedToHive(flowerPos))
+            {
+                connectedFlowers.Add(flowerPos);
+            }
+        }
+
+        return connectedFlowers;
+    }
+
+    /// <summary>
+    /// Public getter for all flower positions (connected or not).
+    /// </summary>
+    public List<Vector2Int> GetAllFlowerPositions()
+    {
+        return new List<Vector2Int>(flowerPositions);
+    }
 }
