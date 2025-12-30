@@ -5,6 +5,7 @@ using System.Collections.Generic;
 /// <summary>
 /// Detects which hex tile the player's mouse is hovering over.
 /// Shows buildable positions when hovering, locks them when clicking.
+/// NEW: Holding Shift AFTER clicking enables rapid-build mode for quick connector placement.
 /// </summary>
 public class TileHoverDetector : MonoBehaviour
 {
@@ -22,8 +23,8 @@ public class TileHoverDetector : MonoBehaviour
     [SerializeField] private float highlightYOffset = 0.1f;
 
     [Header("Outline Settings")]
-    [SerializeField] private Material outlineMaterial; // Different material for hover state
-    [SerializeField] private Material normalHighlightMaterial; // Normal highlight material
+    [SerializeField] private Material outlineMaterial;
+    [SerializeField] private Material normalHighlightMaterial;
 
     // Currently hovered tile coordinate
     private Vector2Int? currentHoveredCoord = null;
@@ -39,8 +40,15 @@ public class TileHoverDetector : MonoBehaviour
     // Track if highlights are currently locked (after clicking a tile)
     private bool highlightsLocked = false;
 
-    // Reference to mouse for New Input System
+    // NEW: Track the coordinate of the locked tile (for rapid-build mode)
+    private Vector2Int? lockedTileCoord = null;
+
+    // NEW: Track if we're in rapid-build mode (Shift held AFTER placing a connector)
+    private bool rapidBuildModeActive = false;
+
+    // Reference to mouse and keyboard for New Input System
     private Mouse mouse;
+    private Keyboard keyboard;
 
     void Start()
     {
@@ -50,6 +58,7 @@ public class TileHoverDetector : MonoBehaviour
         }
 
         mouse = Mouse.current;
+        keyboard = Keyboard.current;
     }
 
     void Update()
@@ -60,8 +69,20 @@ public class TileHoverDetector : MonoBehaviour
             return;
         }
 
-        if (mouse == null)
+        if (mouse == null || keyboard == null)
         {
+            return;
+        }
+
+        // Check if Shift key is being held
+        bool isShiftHeld = keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed;
+
+        // NEW: If rapid-build mode is active but Shift was released, exit rapid-build mode
+        if (rapidBuildModeActive && !isShiftHeld)
+        {
+            UnlockHighlights();
+            rapidBuildModeActive = false;
+            Debug.Log("Rapid-build mode ended (Shift released)");
             return;
         }
 
@@ -80,7 +101,7 @@ public class TileHoverDetector : MonoBehaviour
         // Check for click
         if (mouse.leftButton.wasPressedThisFrame)
         {
-            HandleClick();
+            HandleClick(isShiftHeld);
         }
     }
 
@@ -203,8 +224,9 @@ public class TileHoverDetector : MonoBehaviour
 
     /// <summary>
     /// Handles mouse click - either locks highlights or selects a highlight.
+    /// NEW: Pass isShiftHeld to control rapid-build behavior.
     /// </summary>
-    void HandleClick()
+    void HandleClick(bool isShiftHeld)
     {
         if (highlightsLocked)
         {
@@ -212,12 +234,13 @@ public class TileHoverDetector : MonoBehaviour
             if (currentHoveredHighlightCoord.HasValue)
             {
                 // Player clicked on a highlight - build there
-                OnHighlightSelected(currentHoveredHighlightCoord.Value);
+                OnHighlightSelected(currentHoveredHighlightCoord.Value, isShiftHeld);
             }
             else
             {
                 // Player clicked somewhere else - cancel/unlock
                 UnlockHighlights();
+                rapidBuildModeActive = false;
             }
         }
         else
@@ -225,18 +248,21 @@ public class TileHoverDetector : MonoBehaviour
             // Highlights not locked - check if clicking on a tile to lock highlights
             if (currentHoveredCoord.HasValue)
             {
-                LockHighlights();
+                LockHighlights(currentHoveredCoord.Value);
             }
         }
     }
 
     /// <summary>
     /// Locks the currently visible highlights in place.
+    /// NEW: Store the locked tile coordinate for rapid-build mode.
     /// </summary>
-    void LockHighlights()
+    void LockHighlights(Vector2Int tileCoord)
     {
         highlightsLocked = true;
-        Debug.Log($"Highlights locked - {activeHighlights.Count} buildable positions");
+        lockedTileCoord = tileCoord;
+        rapidBuildModeActive = false; // Not in rapid-build mode yet
+        Debug.Log($"Highlights locked at {tileCoord} - {activeHighlights.Count} buildable positions");
     }
 
     /// <summary>
@@ -247,6 +273,7 @@ public class TileHoverDetector : MonoBehaviour
         ClearHighlights();
         ClearHighlightOutline();
         highlightsLocked = false;
+        lockedTileCoord = null;
         currentHoveredTile = null;
         currentHoveredCoord = null;
         Debug.Log("Highlights unlocked");
@@ -254,33 +281,58 @@ public class TileHoverDetector : MonoBehaviour
 
     /// <summary>
     /// Called when player selects a specific highlight to build on.
+    /// NEW: If Shift is held, immediately re-lock highlights on the newly placed connector.
     /// </summary>
-    void OnHighlightSelected(Vector2Int coord)
+    void OnHighlightSelected(Vector2Int coord, bool isShiftHeld)
     {
-        Debug.Log($"Selected position {coord} for building!");
+        Debug.Log($"Selected position {coord} for building!" + (isShiftHeld ? " [SHIFT - RAPID BUILD]" : ""));
 
-        // NEW: Check if player can afford the Connector
+        // Check if player can afford the Connector
         if (!ResourceManager.Instance.CanAffordConnector())
         {
             Debug.Log("Not enough Wax! Need 10 Wax to build.");
-            // Optional: Flash red text or play error sound
-            UnlockHighlights(); // Clear highlights
+            UnlockHighlights();
+            rapidBuildModeActive = false;
             return;
         }
 
-        // NEW: Deduct the Wax cost
+        // Deduct the Wax cost
         if (!ResourceManager.Instance.SpendWax(10))
         {
             Debug.LogWarning("Failed to spend Wax!");
             UnlockHighlights();
+            rapidBuildModeActive = false;
             return;
         }
 
         // Spawn the connector tile at this position
         hexGrid.SpawnConnectorTile(coord);
 
-        // Clear all highlights and unlock
-        UnlockHighlights();
+        // NEW: Rapid-build mode behavior
+        if (isShiftHeld)
+        {
+            // Clear old highlights and outline
+            ClearHighlights();
+            ClearHighlightOutline();
+
+            // The newly placed connector becomes the new locked tile
+            lockedTileCoord = coord;
+
+            // Show highlights around the new connector
+            ShowBuildablePositions(coord);
+
+            // Keep highlights locked AND activate rapid-build mode
+            highlightsLocked = true;
+            rapidBuildModeActive = true;
+
+            Debug.Log($"Rapid-build mode activated: New connector at {coord} is now locked tile");
+        }
+        else
+        {
+            // Normal mode: Clear all highlights and unlock
+            UnlockHighlights();
+            rapidBuildModeActive = false;
+        }
     }
 
     /// <summary>
@@ -385,6 +437,8 @@ public class TileHoverDetector : MonoBehaviour
         ClearHighlights();
         ClearHighlightOutline();
         highlightsLocked = false;
+        lockedTileCoord = null;
+        rapidBuildModeActive = false;
         currentHoveredTile = null;
         currentHoveredCoord = null;
     }

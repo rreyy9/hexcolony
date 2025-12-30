@@ -1576,9 +1576,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7de2c9a9875e0464da6b049ee58081c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WorkerVisualizer
-  workerPrefab: {fileID: 0}
-  heightAboveTile: 0.5
-  bobSpeed: 2
+  swarmThreshold: 5
+  individualBeeScale: 0.3
+  swarmOrbitRadius: 0.5
+  swarmOrbitSpeed: 30
+  giantBeeBaseScale: 0.5
+  giantBeeGrowthRate: 0.1
+  giantBeeRotationSpeed: 20
+  heightAboveTile: 1
+  bobSpeed: 5
   bobAmount: 0.2
   hiveWorkerColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   flowerWorkerColor: {r: 1, g: 0, b: 1, a: 1}
@@ -2012,8 +2018,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 980a74a7cb3d06d43b19319bdbed91a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ResourceManager
-  currentWax: 0
-  currentNectar: 0
+  currentWax: 1000
+  currentNectar: 1000
   workerCost: 30
 --- !u!4 &1883342024
 Transform:
