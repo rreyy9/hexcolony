@@ -24,7 +24,7 @@ public class WorkerVisualizer : MonoBehaviour
 
     void Start()
     {
-        hexGrid = FindObjectOfType<HexGrid>();
+        hexGrid = Object.FindFirstObjectByType<HexGrid>();
         resourceManager = ResourceManager.Instance;
 
         if (hexGrid == null)

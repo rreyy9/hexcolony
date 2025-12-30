@@ -12,7 +12,6 @@ public class ResourceManager : MonoBehaviour
 
     [Header("Worker Settings")]
     [SerializeField] private int workerCost = 30; // Cost in Nectar
-    [SerializeField] private int maxWorkers = 5;
 
     // List of all active workers
     private List<WorkerBee> activeWorkers = new List<WorkerBee>();
@@ -40,7 +39,7 @@ public class ResourceManager : MonoBehaviour
     void Start()
     {
         // Find HexGrid in scene
-        hexGrid = FindObjectOfType<HexGrid>();
+        hexGrid = Object.FindFirstObjectByType<HexGrid>();
         if (hexGrid == null)
         {
             Debug.LogError("HexGrid not found! ResourceManager needs HexGrid reference.");
@@ -96,7 +95,6 @@ public class ResourceManager : MonoBehaviour
     public int CurrentWax => currentWax;
     public int CurrentNectar => currentNectar;
     public int ActiveWorkerCount => activeWorkers.Count;
-    public int MaxWorkers => maxWorkers;
 
     // Add resources (from player clicks)
     public void AddWax(int amount)
@@ -134,18 +132,18 @@ public class ResourceManager : MonoBehaviour
     /// </summary>
     public bool CanAffordWorker()
     {
-        return currentNectar >= workerCost && activeWorkers.Count < maxWorkers;
+        return currentNectar >= workerCost; // Only check if player has enough Nectar
     }
 
     /// <summary>
     /// Spawns a new worker bee and assigns it automatically.
-    /// Returns true if successful, false if can't afford or at max workers.
+    /// Returns true if successful, false if can't afford.
     /// </summary>
     public bool SpawnWorker()
     {
         if (!CanAffordWorker())
         {
-            Debug.Log($"Cannot spawn worker: Need {workerCost} Nectar and less than {maxWorkers} workers.");
+            Debug.Log($"Cannot spawn worker: Need {workerCost} Nectar.");
             return false;
         }
 
@@ -235,7 +233,7 @@ public class ResourceManager : MonoBehaviour
         WorkerBee newWorker = new WorkerBee(assignedCoord, assignedType);
         activeWorkers.Add(newWorker);
 
-        Debug.Log($"Worker {activeWorkers.Count}/{maxWorkers} spawned! Assigned to {assignedType} at {assignedCoord}");
+        Debug.Log($"Worker #{activeWorkers.Count} spawned! Assigned to {assignedType} at {assignedCoord}");
     }
 
     /// <summary>

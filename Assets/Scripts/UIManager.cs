@@ -46,9 +46,6 @@ public class UIManager : MonoBehaviour
         UpdateUI();
     }
 
-    /// <summary>
-    /// Updates all UI elements with current game state.
-    /// </summary>
     void UpdateUI()
     {
         if (resourceManager == null) return;
@@ -66,7 +63,8 @@ public class UIManager : MonoBehaviour
 
         if (workerCountText != null)
         {
-            workerCountText.text = $"Workers: {resourceManager.ActiveWorkerCount} / {resourceManager.MaxWorkers}";
+            //Only show current count
+            workerCountText.text = $"Workers: {resourceManager.ActiveWorkerCount}";
         }
 
         // Update spawn worker button state
@@ -81,26 +79,14 @@ public class UIManager : MonoBehaviour
         if (spawnWorkerButton == null) return;
 
         bool canAfford = resourceManager.CanAffordWorker();
-        bool atMaxWorkers = resourceManager.ActiveWorkerCount >= resourceManager.MaxWorkers;
 
-        // Enable/disable button
+        // Enable/disable button based only on Nectar
         spawnWorkerButton.interactable = canAfford;
 
         // Update button text
         if (spawnWorkerButtonText != null)
         {
-            if (atMaxWorkers)
-            {
-                spawnWorkerButtonText.text = "Max Workers";
-            }
-            else if (!canAfford)
-            {
-                spawnWorkerButtonText.text = "Spawn Worker";
-            }
-            else
-            {
-                spawnWorkerButtonText.text = "Spawn Worker";
-            }
+            spawnWorkerButtonText.text = "Spawn Worker";
         }
 
         // Update cost text color based on affordability
@@ -118,12 +104,7 @@ public class UIManager : MonoBehaviour
             }
         }
 
-        // Hide button if at max workers
-        if (atMaxWorkers && spawnWorkerButton.gameObject.activeSelf)
-        {
-            // Optional: Hide the button entirely when at max
-            // spawnWorkerButton.gameObject.SetActive(false);
-        }
+        // REMOVED: No more max workers check
     }
 
     /// <summary>
