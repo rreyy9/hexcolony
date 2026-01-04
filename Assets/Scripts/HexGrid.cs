@@ -187,7 +187,7 @@ public class HexGrid : MonoBehaviour
     /// Used to find all possible flower spawn positions at a specific distance.
     /// Returns a list of coordinates forming a hexagonal ring shape.
     /// </summary>
-    List<Vector2Int> GetHexesAtDistance(Vector2Int center, int distance)
+    public List<Vector2Int> GetHexesAtDistance(Vector2Int center, int distance)
     {
         List<Vector2Int> results = new List<Vector2Int>();
 
@@ -343,6 +343,42 @@ public class HexGrid : MonoBehaviour
     /// Public getter for all flower positions (connected or not).
     /// </summary>
     public List<Vector2Int> GetAllFlowerPositions()
+    {
+        return new List<Vector2Int>(flowerPositions);
+    }
+
+    /// <summary>
+    /// Public method to spawn a flower tile at the specified grid coordinate.
+    /// Used by FlowerExpansionManager to create expansion flowers.
+    /// </summary>
+    public void SpawnFlowerTile(Vector2Int coord)
+    {
+        // Don't allow placing a tile where one already exists
+        if (spawnedTiles.ContainsKey(coord))
+        {
+            Debug.LogWarning($"Tile already exists at {coord}");
+            return;
+        }
+
+        // Don't allow placing tiles outside the grid boundaries
+        if (!IsValidPosition(coord))
+        {
+            Debug.LogWarning($"Position {coord} is outside grid radius");
+            return;
+        }
+
+        // Use existing flowerPositions count to name the new flower
+        SpawnTile(coord, flowerTilePrefab, $"Flower_{flowerPositions.Count + 1}");
+
+        // Add to the flower positions list so we track all flowers
+        flowerPositions.Add(coord);
+    }
+
+    /// <summary>
+    /// Returns a copy of all flower positions spawned in the game.
+    /// Used by FlowerExpansionManager to find expansion positions.
+    /// </summary>
+    public List<Vector2Int> GetFlowerPositions()
     {
         return new List<Vector2Int>(flowerPositions);
     }

@@ -1,4 +1,5 @@
 # Bee Colony Expansion - Resource & Bee System Design
+# Bee Colony Expansion - Resource & Bee System Design
 
 **Document Version:** 2.0  
 **Last Updated:** December 30, 2025  

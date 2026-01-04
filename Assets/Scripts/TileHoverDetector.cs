@@ -82,7 +82,7 @@ public class TileHoverDetector : MonoBehaviour
         {
             UnlockHighlights();
             rapidBuildModeActive = false;
-            Debug.Log("Rapid-build mode ended (Shift released)");
+            //Debug.Log("Rapid-build mode ended (Shift released)");
             return;
         }
 
@@ -134,7 +134,7 @@ public class TileHoverDetector : MonoBehaviour
                 // Show preview highlights around this tile
                 ShowPreviewHighlights(hoveredCoord);
 
-                Debug.Log($"Hovering over tile at {hoveredCoord}");
+                //Debug.Log($"Hovering over tile at {hoveredCoord}");
             }
         }
         else
@@ -208,7 +208,7 @@ public class TileHoverDetector : MonoBehaviour
                     // Apply outline
                     ApplyHighlightOutline(currentHoveredHighlight);
 
-                    Debug.Log($"Hovering over buildable position at {hoveredCoord}");
+                    //Debug.Log($"Hovering over buildable position at {hoveredCoord}");
                 }
             }
             else
@@ -262,7 +262,7 @@ public class TileHoverDetector : MonoBehaviour
         highlightsLocked = true;
         lockedTileCoord = tileCoord;
         rapidBuildModeActive = false; // Not in rapid-build mode yet
-        Debug.Log($"Highlights locked at {tileCoord} - {activeHighlights.Count} buildable positions");
+        //Debug.Log($"Highlights locked at {tileCoord} - {activeHighlights.Count} buildable positions");
     }
 
     /// <summary>
@@ -276,7 +276,7 @@ public class TileHoverDetector : MonoBehaviour
         lockedTileCoord = null;
         currentHoveredTile = null;
         currentHoveredCoord = null;
-        Debug.Log("Highlights unlocked");
+        //Debug.Log("Highlights unlocked");
     }
 
     /// <summary>
@@ -285,12 +285,12 @@ public class TileHoverDetector : MonoBehaviour
     /// </summary>
     void OnHighlightSelected(Vector2Int coord, bool isShiftHeld)
     {
-        Debug.Log($"Selected position {coord} for building!" + (isShiftHeld ? " [SHIFT - RAPID BUILD]" : ""));
+        //Debug.Log($"Selected position {coord} for building!" + (isShiftHeld ? " [SHIFT - RAPID BUILD]" : ""));
 
         // Check if player can afford the Connector
         if (!ResourceManager.Instance.CanAffordConnector())
         {
-            Debug.Log("Not enough Wax! Need 10 Wax to build.");
+            //Debug.Log("Not enough Wax! Need 10 Wax to build.");
             UnlockHighlights();
             rapidBuildModeActive = false;
             return;
@@ -299,7 +299,7 @@ public class TileHoverDetector : MonoBehaviour
         // Deduct the Wax cost
         if (!ResourceManager.Instance.SpendWax(10))
         {
-            Debug.LogWarning("Failed to spend Wax!");
+            //Debug.LogWarning("Failed to spend Wax!");
             UnlockHighlights();
             rapidBuildModeActive = false;
             return;
@@ -325,7 +325,7 @@ public class TileHoverDetector : MonoBehaviour
             highlightsLocked = true;
             rapidBuildModeActive = true;
 
-            Debug.Log($"Rapid-build mode activated: New connector at {coord} is now locked tile");
+            //Debug.Log($"Rapid-build mode activated: New connector at {coord} is now locked tile");
         }
         else
         {
@@ -358,7 +358,7 @@ public class TileHoverDetector : MonoBehaviour
     {
         if (highlightPrefab == null)
         {
-            Debug.LogWarning("Highlight prefab not assigned!");
+            //Debug.LogWarning("Highlight prefab not assigned!");
             return;
         }
 
